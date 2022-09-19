@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour {
 
-    public GameObject hazard;
+    public GameObject[] hazards;
     public Vector3 spawnValues;
     public int hazardCount;
     public float startWailt;
@@ -16,14 +16,14 @@ public class GameController : MonoBehaviour {
     private int score;
     public Text scoreText;
 
-    public Text restartText;
+    public GameObject restartGameObject;
     private bool restart;
-    public Text gameOverText;
+    public GameObject gameOverGameObject;
     private bool gameOver;
 
     private void Start() {
-        restartText.gameObject.SetActive(false);
-        gameOverText.gameObject.SetActive(false);
+        restartGameObject.SetActive(false);
+        gameOverGameObject.SetActive(false);
 
         score = 0;
         UpdateScore();
@@ -32,25 +32,32 @@ public class GameController : MonoBehaviour {
 
     private void Update() {
         if (restart && Input.GetKeyDown(KeyCode.R)) {
-            /*SceneManager.LoadScene(0);
-            SceneManager.LoadScene("Main");
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);*/
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            Restart();
         }
+    }
+
+    public void Restart() {
+        /*SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Main");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);*/
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     IEnumerator SpawnWaves() {
         yield return new WaitForSeconds(startWailt);
         while (true) {
             for (int i = 0; i < hazardCount; i++) {
-                Vector3 spawnPosition = new Vector3(Random.Range(-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
+                GameObject hazard = hazards[Random.Range(0, hazards.Length)];
+                Vector2 half = Utils.GetDimensionsInWorldUnits() / 2;
+                // Vector3 spawnPosition = new Vector3(Random.Range(-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
+                Vector3 spawnPosition = new Vector3(Random.Range(-half.x + 1.17f, half.x - 1.17f), spawnValues.y, spawnValues.z);
                 Instantiate(hazard, spawnPosition, Quaternion.identity);
                 yield return new WaitForSeconds(spawnWait);
             }
             yield return new WaitForSeconds(waveWait);
 
             if (gameOver) {
-                restartText.gameObject.SetActive(true);
+                restartGameObject.SetActive(true);
                 restart = true;
                 break;
             }
@@ -67,7 +74,7 @@ public class GameController : MonoBehaviour {
     }
 
     public void GameOver() {
-        gameOverText.gameObject.SetActive(true);
+        gameOverGameObject.SetActive(true);
         gameOver = true;
     }
 

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityStandardAssets.CrossPlatformInput;
 
 [System.Serializable]
 public class Boundary {
@@ -27,8 +28,22 @@ public class PlayerController : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
     }
 
+    private void Start() {
+        UpdateBoundary();
+    }
+
+    private void UpdateBoundary() {
+        Vector2 half = Utils.GetDimensionsInWorldUnits() / 2;
+        // Debug.Log("Half * 2 " + half * 2);
+        // Debug.Log("Half / 2 " + half);
+        boundary.xMin = -half.x + 0.87f;
+        boundary.xMax = half.x - 0.87f;
+        boundary.zMin = -half.y + 9;
+        boundary.zMax = half.y + 2;
+    }
+
     private void Update() {
-        if (Input.GetButton("Fire1") && Time.time > nextFire) {
+        if (CrossPlatformInputManager.GetButton("Fire1") && Time.time > nextFire) {
             nextFire = Time.time + fireRate;
             Instantiate(shot, shotSpawn.position, Quaternion.identity);
             audioSource.Play();
@@ -36,8 +51,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        float moveHorizontal = CrossPlatformInputManager.GetAxis("Horizontal");
+        float moveVertical = CrossPlatformInputManager.GetAxis("Vertical");
 
         Vector3 movement = new Vector3(moveHorizontal, 0f, moveVertical);
         rig.velocity = movement * speed;
